@@ -31,7 +31,7 @@ class Menu(models.Model):
     is_item_of_the_day = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} : {str(self.price)}'
 
 
 class Cart(models.Model):

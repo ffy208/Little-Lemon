@@ -37,8 +37,6 @@ urlpatterns = [
     path('api/groups/delivery-crew/users/', list_delivery_crew),
     path('api/groups/delivery-crew/users/add/', add_delivery_crew),
     path('api/groups/delivery-crew/users/<int:userId>/', remove_delivery_crew),
-    path('api/auth/', include('djoser.urls')),
-    path('api/auth/', include('djoser.urls.authtoken')),  # 处理 Token 认证
 
     # 购物车
     path('api/cart/menu-items/', get_cart),
