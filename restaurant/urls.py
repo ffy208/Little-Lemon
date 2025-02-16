@@ -52,4 +52,5 @@ urlpatterns = [
     path('api/orders/<int:orderId>/update/', update_order),
     path('api/orders/<int:orderId>/status/', update_order_status),
     path('api/menu-items/<int:menu_id>/item-of-the-day/', set_item_of_the_day),
+    path('bookings/', views.bookings, name="bookings"),
 ]

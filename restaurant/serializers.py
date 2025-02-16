@@ -3,6 +3,8 @@ from .models import Booking, Menu, Cart, Order, OrderItem, Category
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    reservation_date = serializers.DateField(format="%Y-%m-%d")  # 确保日期格式一致
+    reservation_slot = serializers.IntegerField()  # 确保时间段是整数
     class Meta:
         model = Booking
         fields = '__all__'

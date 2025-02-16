@@ -6,11 +6,17 @@ from rest_framework.permissions import AllowAny
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions, status
-from rest_framework.response import Response
 from .models import Cart, Order, OrderItem
 from .serializers import CartSerializer, OrderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from django.shortcuts import render
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
+from datetime import datetime
+import json
+from .models import Booking
 
 
 
@@ -282,3 +288,102 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
 
 
+# @csrf_exempt
+# def bookings(request):
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.body)
+#
+#             # 确保请求数据包含必要字段
+#             required_fields = ["first_name", "reservation_date", "reservation_slot"]
+#             if not all(field in data for field in required_fields):
+#                 return JsonResponse({"error": "Missing required fields"}, status=400)
+#
+#             # 检查该时间段是否已被预订
+#             exist = Booking.objects.filter(
+#                 reservation_date=data["reservation_date"],
+#                 reservation_slot=data["reservation_slot"]
+#             ).exists()
+#
+#             if not exist:
+#                 booking = Booking(
+#                     first_name=data["first_name"],
+#                     last_name=data.get("last_name", ""),  # 如果没有提供 last_name，默认为空
+#                     guest_number=data.get("guest_number", 1),  # 如果没有提供 guest_number，默认为 1
+#                     comment=data.get("comment", ""),  # 如果没有提供 comment，默认为空
+#                     reservation_date=data["reservation_date"],
+#                     reservation_slot=data["reservation_slot"]
+#                 )
+#                 booking.save()
+#                 return JsonResponse({"success": 1})  # 返回成功信息
+#             else:
+#                 return JsonResponse({"error": "Time slot already booked"}, status=400)
+#
+#         except json.JSONDecodeError:
+#             return JsonResponse({"error": "Invalid JSON"}, status=400)
+#
+#     # 处理 GET 请求，返回预订信息
+#     date_str = request.GET.get("date", None)
+#     if not date_str:
+#         date = datetime.today().date()
+#     else:
+#         try:
+#             date = datetime.strptime(date_str, "%Y-%m-%d").date()
+#         except ValueError:
+#             return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+#
+#     bookings = Booking.objects.filter(reservation_date=date)
+#     booking_json = serializers.serialize("json", bookings)
+#
+#     return HttpResponse(booking_json, content_type="application/json")
+
+
+
+@csrf_exempt  # 允许不带 CSRF 令牌的请求
+def bookings(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # 确保请求数据包含必要字段
+            required_fields = ["first_name", "reservation_date", "reservation_slot"]
+            if not all(field in data for field in required_fields):
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+
+            # 检查该时间段是否已被预订
+            exist = Booking.objects.filter(
+                reservation_date=data["reservation_date"],
+                reservation_slot=data["reservation_slot"]
+            ).exists()
+
+            if not exist:
+                booking = Booking(
+                    first_name=data["first_name"],
+                    last_name=data.get("last_name", ""),  # 如果没有提供 last_name，默认为空
+                    guest_number=data.get("guest_number", 1),  # 如果没有提供 guest_number，默认为 1
+                    comment=data.get("comment", ""),  # 如果没有提供 comment，默认为空
+                    reservation_date=data["reservation_date"],
+                    reservation_slot=data["reservation_slot"]
+                )
+                booking.save()
+                return JsonResponse({"success": 1})  # 返回成功信息
+            else:
+                return JsonResponse({"error": "Time slot already booked"}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    # 处理 GET 请求，返回预订信息
+    date_str = request.GET.get("date", None)
+    if not date_str:
+        date = datetime.today().date()
+    else:
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+
+    bookings = Booking.objects.filter(reservation_date=date)
+    booking_json = serializers.serialize("json", bookings)
+
+    return HttpResponse(booking_json, content_type="application/json")

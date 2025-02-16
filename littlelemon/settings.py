@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'littlelemon.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'reservations',  # 你的数据库名
+        'USER': 'admindjango',   # 你的 MySQL 用户名
+        'PASSWORD': 'employee@123!',  # 你的 MySQL 密码
+        'HOST': 'localhost',  # 如果 MySQL 在本地，保持 localhost
+        'PORT': '3306',       # MySQL 默认端口
     }
 }
 
